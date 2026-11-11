@@ -16,7 +16,9 @@
 // #define PUGIXML_WCHAR_MODE
 
 // Uncomment this to enable from_chars/to_chars for number conversion
+#ifndef __APPLE__ // Modified in November 2026 for PadPlus (macOS): Apple's libc++ has no floating-point std::from_chars before Xcode 26
 #define PUGIXML_CHARCONV_FLOAT
+#endif
 
 // Uncomment this to enable compact mode
 // #define PUGIXML_COMPACT

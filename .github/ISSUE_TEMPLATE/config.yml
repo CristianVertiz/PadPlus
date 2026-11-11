@@ -1,1 +1,5 @@
 blank_issues_enabled: true
+contact_links:
+  - name: Notepad++ on Windows
+    url: https://github.com/notepad-plus-plus/notepad-plus-plus/issues
+    about: PadPlus is an independent project. Issues with Notepad++ itself go to the Notepad++ project.

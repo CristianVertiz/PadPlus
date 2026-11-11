@@ -13,6 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
+//
+// Modified in November 2026 for PadPlus (macOS): native path separator, path string conversion. See macos/REUSE_PORT_NEW.md.
 
 
 #include "functionParser.h"
@@ -151,7 +153,7 @@ bool FunctionParsersManager::getUnitPaserParameters(
 bool FunctionParsersManager::loadFuncListFromXmlTree(const std::wstring& xmlDirPath, LangType lType, const std::wstring& overrideId, int udlIndex)
 {
 	std::wstring funcListRulePath = xmlDirPath;
-	funcListRulePath += L"\\";
+	funcListRulePath += NPP_SEP;
 	int index = -1;
 	if (lType == L_USER) // UDL
 	{
@@ -253,7 +255,7 @@ bool FunctionParsersManager::loadFuncListFromXmlTree(const std::wstring& xmlDirP
 bool FunctionParsersManager::getOverrideMapFromXmlTree(const std::wstring& xmlDirPath)
 {
 	std::wstring funcListRulePath = xmlDirPath;
-	funcListRulePath += L"\\overrideMap.xml";
+	funcListRulePath += NPP_SEP L"overrideMap.xml";
 	
 	NppXml::NewDocument xmlFuncListDoc{};
 	const bool loadOK = NppXml::loadFile(&xmlFuncListDoc, funcListRulePath.c_str());

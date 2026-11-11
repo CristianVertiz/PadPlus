@@ -1,6 +1,11 @@
 name: CI_build
 
-on: [push, pull_request]
+# Modified in November 2026 for PadPlus: these Windows jobs run for master only; the macos branch and its pull requests are built by macos.yml.
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
 env:
   PYTHON_ALLOW_CACHE: true
   PYTHON_DIR_CACHE: D:\.cache\python

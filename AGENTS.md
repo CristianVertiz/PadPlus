@@ -1,29 +1,29 @@
 # AGENTS.md
 
+This branch (`macos`) is PadPlus: an independent macOS editor based on the Notepad++ source code. The upstream rule "support Windows only" applies to
+Notepad++ itself (`master`), not to this branch.
+
 ## Before making changes
 
-- Read [Contribution Rules](CONTRIBUTING.md) and follow its requirements.
-- Check the relevant documentation and existing code patterns before editing.
-- Keep changes focused and small, avoid unrelated refactoring or formatting.
+- Read [CONTRIBUTING.md](CONTRIBUTING.md) and the [developer guide](macos/README.md).
+- Check existing code patterns before editing. Keep changes focused and small; no unrelated refactoring or formatting.
 
 ## Project constraints
 
 - Do not modify `scintilla/` or `lexilla/`.
-- Do not submit refactoring-only or typo-fix-only changes. They will be rejected.
-- Support Windows only, do not add support for other platforms.
+- The macOS code lives in `macos/`. Edit other upstream files only when unavoidable: keep the edit minimal, preserve the file's line endings
+  (several are CRLF, so edit byte-exact), and add a dated "Modified ... for PadPlus" comment under the licence header.
+- Do not use the Notepad++ name or logo as PadPlus's branding. "Based on the Notepad++ source code" is the wording; the app ships its own icon.
+- New source files start with the SPDX and copyright header lines used in `macos/`.
+- Never open pull requests against the upstream Notepad++ repository from this work.
 
 ## Validation
 
-- Enable GitHub Actions on your fork.
-- Submit a PR only after all required build workflows pass.
-- Run the relevant build and test it locally before opening a PR.
+- Build and run every test program (developer guide, section "Test"); each must print `OK`.
+- After packaging changes, run `package_app` and `macos/tests/package_check.sh macos/build/PadPlus.app --packaged`.
+- Tests and manual runs must use a temporary `HOME` and `NPP_SETTINGS_DIR`; never touch the real profile in `~/Library/Application Support/Notepad++`.
 
-## PR instructions
+## Pull requests
 
-- Use [pull request template](.github/pull_request_template.md).
-- Contributors must manually check the confirmation box in the PR template.
-- Link every PR to an issue using `fix #NNNNN`.
-- Disclose AI assistance, including the model. If possible also the prompt.
-- Include AI agent as a co-author using a `Co-Authored-By` trailer.
-- Contributors are encouraged to write their own PR descriptions.
-- Comments and replies should be written by the contributors themselves.
+- Target the `macos` branch and use the [pull request template](.github/pull_request_template.md).
+- Disclose AI assistance, including the model, and add the agent as a co-author with a `Co-Authored-By` trailer.

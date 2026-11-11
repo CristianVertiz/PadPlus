@@ -13,6 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
+//
+// Modified in November 2026 for PadPlus (macOS): native path separator constant. See macos/REUSE_PORT_NEW.md.
 
 
 #pragma once
@@ -133,6 +135,14 @@ protected:
 };
 
 std::wstring pathRemoveFileSpec(std::wstring & path);
+// Native path separator (macOS port: '/'; Windows behaviour unchanged).
+#ifdef _WIN32
+constexpr wchar_t kPathSep = L'\\';
+#define NPP_SEP L"\\"
+#else
+constexpr wchar_t kPathSep = L'/';
+#define NPP_SEP L"/"
+#endif
 std::wstring pathAppend(std::wstring &strDest, const std::wstring & str2append);
 COLORREF getCtrlBgColor(HWND hWnd);
 std::wstring stringToUpper(std::wstring strToConvert);

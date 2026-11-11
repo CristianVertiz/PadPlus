@@ -13,6 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
+//
+// Modified in November 2026 for PadPlus (macOS): native path separator. See macos/REUSE_PORT_NEW.md.
 
 
 #include "Parameters.h"
@@ -1373,7 +1375,7 @@ bool NppParameters::load()
 
 	// Detection cloud settings
 	std::wstring cloudChoicePath{_userPath};
-	cloudChoicePath += L"\\cloud\\choice";
+	cloudChoicePath += NPP_SEP L"cloud" NPP_SEP L"choice";
 
 	//
 	// the 2nd priority: Cloud Choice Path
@@ -1636,7 +1638,7 @@ bool NppParameters::load()
 	{
 		// overwrite nativeLangPath variable
 		nativeLangPath = _nppPath;
-		pathAppend(nativeLangPath, L"localization\\");
+		pathAppend(nativeLangPath, L"localization" NPP_SEP);
 		pathAppend(nativeLangPath, _startWithLocFileName);
 	}
 	else // use %appdata% location, or (if absence then) npp installed location
@@ -3588,7 +3590,7 @@ bool NppParameters::getSessionFromXmlTree(const NppXml::Document& pSessionDoc, S
 						static_cast<void>(::StringCchCopyW(normalizedBackupFilePath, MAX_PATH, fn));
 					}
 
-					std::wstring currentBackupFilePath = NppParameters::getInstance().getUserPath() + L"\\backup\\";
+					std::wstring currentBackupFilePath = NppParameters::getInstance().getUserPath() + NPP_SEP L"backup" NPP_SEP;
 
 					wchar_t normalizedBackupDir[MAX_PATH]{};
 					if (::GetFullPathNameW(currentBackupFilePath.c_str(), MAX_PATH, normalizedBackupDir, NULL) == 0)
@@ -4485,7 +4487,7 @@ LangType NppParameters::getLangFromExt(const wchar_t *ext)
 void NppParameters::setCloudChoice(const wchar_t* pathChoice) const
 {
 	std::wstring cloudChoicePath = getSettingsFolder();
-	cloudChoicePath += L"\\cloud\\";
+	cloudChoicePath += NPP_SEP L"cloud" NPP_SEP;
 
 	if (!doesDirectoryExist(cloudChoicePath.c_str()))
 	{
@@ -4503,7 +4505,7 @@ void NppParameters::removeCloudChoice() const
 {
 	std::wstring cloudChoicePath = getSettingsFolder();
 
-	cloudChoicePath += L"\\cloud\\choice";
+	cloudChoicePath += NPP_SEP L"cloud" NPP_SEP L"choice";
 	if (doesFileExist(cloudChoicePath.c_str()))
 	{
 		::DeleteFile(cloudChoicePath.c_str());
@@ -7116,13 +7118,13 @@ void NppParameters::feedGUIParameters(const NppXml::Element& element)
 				if (!xmlFileName.empty() && std::wcscmp(xmlFileName.c_str(), L"stylers.xml") != 0)
 				{
 					themePath = isLocalOnly ? _nppPath : _userPath;
-					pathAppend(themePath, L"themes\\");
+					pathAppend(themePath, L"themes" NPP_SEP);
 					pathAppend(themePath, xmlFileName);
 
 					if (!isLocalOnly && !doesFileExist(themePath.c_str()))
 					{
 						themePath = _nppPath;
-						pathAppend(themePath, L"themes\\");
+						pathAppend(themePath, L"themes" NPP_SEP);
 						pathAppend(themePath, xmlFileName);
 					}
 				}

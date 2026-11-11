@@ -13,6 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
+//
+// Modified in November 2026 for PadPlus (macOS): native path separator. See macos/REUSE_PORT_NEW.md.
 
 
 #include "Common.h"
@@ -737,7 +739,7 @@ wstring pathAppend(wstring& strDest, const wstring& str2append)
 {
 	if (strDest.empty() && str2append.empty()) // "" + ""
 	{
-		strDest = L"\\";
+		strDest = NPP_SEP;
 		return strDest;
 	}
 
@@ -747,22 +749,22 @@ wstring pathAppend(wstring& strDest, const wstring& str2append)
 		return strDest;
 	}
 
-	if (strDest[strDest.length() - 1] == '\\' && (!str2append.empty() && str2append[0] == '\\')) // toto\ + \titi
+	if (strDest[strDest.length() - 1] == kPathSep && (!str2append.empty() && str2append[0] == kPathSep)) // toto\ + \titi
 	{
 		strDest.erase(strDest.length() - 1, 1);
 		strDest += str2append;
 		return strDest;
 	}
 
-	if ((strDest[strDest.length() - 1] == '\\' && (!str2append.empty() && str2append[0] != '\\')) // toto\ + titi
-		|| (strDest[strDest.length() - 1] != '\\' && (!str2append.empty() && str2append[0] == '\\'))) // toto + \titi
+	if ((strDest[strDest.length() - 1] == kPathSep && (!str2append.empty() && str2append[0] != kPathSep)) // toto\ + titi
+		|| (strDest[strDest.length() - 1] != kPathSep && (!str2append.empty() && str2append[0] == kPathSep))) // toto + \titi
 	{
 		strDest += str2append;
 		return strDest;
 	}
 
 	// toto + titi
-	strDest += L"\\";
+	strDest += NPP_SEP;
 	strDest += str2append;
 
 	return strDest;
@@ -2615,7 +2617,7 @@ bool needsElevation4Access(const std::wstring& path2check, bool bWriteAccess)
 	}
 
 	// test the desired access rights
-	HANDLE hFile = ::CreateFileW(testFile.c_str(), bWriteAccess ? GENERIC_WRITE : GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
+	HANDLE hFile = ::CreateFileW(testFile.wstring().c_str(), bWriteAccess ? GENERIC_WRITE : GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
 		nullptr, fileExists ? OPEN_EXISTING : CREATE_NEW, fileExists ? FILE_ATTRIBUTE_NORMAL : FILE_FLAG_DELETE_ON_CLOSE, nullptr);
 	if (hFile != INVALID_HANDLE_VALUE)
 	{

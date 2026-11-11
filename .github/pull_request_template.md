@@ -1,21 +1,18 @@
 <!--
+This repository is PadPlus, an independent macOS editor based on the Notepad++ source code.
+Changes to Notepad++ itself (the Windows application) belong to https://github.com/notepad-plus-plus/notepad-plus-plus, not here.
 
-Please do not create a pull request before reading the contribution guidelines: https://github.com/notepad-plus-plus/notepad-plus-plus/blob/master/CONTRIBUTING.md.
-Please do not create a pull request without linking it to an existing issue or creating a new one first unless it is for translation. 
-
-If your pull request contains **only** XML localization files changes, please prefix the title with `[xml]`. This speeds up the automated XML validation.
-If you are a new contributor or are unsure, please read the guide at https://npp-user-manual.org on how to submit a pull request for a translation.
-
-New contributors should aim to submit small pull requests, ideally limited to 1–4 files and around 30 lines of code.
-
-Add `fix #NNNNN` at the end of your opening comments to automatically link the pull request to the issue.
-
-If you used AI to generate this pull request or the accompanying code, please let us know. This allows us to look out for common issues associated with generated code.
-
+Please keep pull requests small and focused, and target the `macos` branch.
 -->
 
-<!-- You can delete all text below if pull request is only for a translation -->
+## What this changes
 
-- [ ] I have read [contributing guidelines](https://github.com/notepad-plus-plus/notepad-plus-plus/blob/master/CONTRIBUTING.md)
+## How it was tested
 
-fix #NNNNN
+- [ ] The test programs pass (`macos/README.md`, section "Test")
+- [ ] If packaging or the bundle changed: `package_app` and `macos/tests/package_check.sh macos/build/PadPlus.app --packaged` pass
+- [ ] `scintilla/` and `lexilla/` are untouched, and edits to other upstream files are kept minimal
+
+## Notes
+
+<!-- Link an issue with "fix #N" if there is one. Say so if AI tools were used. Contributions are accepted under GPL v3 or later. -->

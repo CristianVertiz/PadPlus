@@ -13,6 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
+//
+// Modified in November 2026 for PadPlus (macOS): native path separator. See macos/REUSE_PORT_NEW.md.
 
 
 #include "Buffer.h"
@@ -1318,7 +1320,7 @@ bool FileManager::backupCurrentBuffer()
 			{
 				// Create file
 				backupFilePath = NppParameters::getInstance().getUserPath();
-				backupFilePath += L"\\backup\\";
+				backupFilePath += NPP_SEP L"backup" NPP_SEP;
 
 				// if "backup" folder doesn't exist, create it.
 				if (!doesDirectoryExist(backupFilePath.c_str()))

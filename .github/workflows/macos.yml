@@ -1,0 +1,96 @@
+# PadPlus (the macOS port in macos/): build, test, package on every push to the macos branch;
+# a tag "padplus-v<version>" also publishes a GitHub release with the disk image.
+name: macOS
+
+on:
+  push:
+    branches: [macos]
+    tags: ['padplus-v*']
+  pull_request:
+    branches: [macos]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-15          # Apple Silicon; the Homebrew Qt it installs sets the oldest macOS the app runs on
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+    - uses: actions/checkout@v7
+
+    - name: Version (from the tag, else the default in macos/CMakeLists.txt)
+      id: version
+      run: |
+        if [ "$GITHUB_REF_TYPE" = tag ]; then v="${GITHUB_REF_NAME#padplus-v}"; else v="$(sed -n 's/^set(PADPLUS_VERSION "\([^"]*\)".*/\1/p' macos/CMakeLists.txt)"; fi
+        echo "version=$v" >> "$GITHUB_OUTPUT"
+
+    - name: Install Qt and Ninja
+      run: brew install ninja qtbase qt5compat
+
+    - name: Build
+      run: |
+        cmake -S macos -B macos/build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_DEPLOYMENT_TARGET=15.0 -DCMAKE_PREFIX_PATH="$(brew --prefix)" -DPADPLUS_VERSION="${{ steps.version.outputs.version }}"
+        set -o pipefail
+        # on failure, repeat the compiler's error lines as annotations so they show on the run's summary page
+        cmake --build macos/build 2>&1 | tee build.log || { grep -E -m 12 -A 4 '(error|Error)[: ]|FAILED:' build.log | cut -c1-400 | awk 'BEGIN{printf "::error title=Build::"} {gsub(/%/,"%25"); printf "%s%%0A", $0} END{print ""}'; clang --version | head -1; exit 1; }
+
+    - name: Test
+      run: |
+        fails=0
+        for t in core_test bridge_test host_test window_test dialogs_test settings_ui_test panels_test toolbar_test macro_test extras_test more_test; do
+          if QT_QPA_PLATFORM=offscreen macos/build/$t > "$t.log" 2>&1; then echo "ok    $t"; else echo "FAIL  $t"; tail -20 "$t.log"; fails=1; fi
+        done
+        exit $fails
+
+    - name: Package (embed Qt, licence texts, ad-hoc signature)
+      run: |
+        set -o pipefail
+        note() { cut -c1-300 | awk -v t="$1" 'BEGIN{printf "::error title=%s::", t} {gsub(/%/,"%25"); printf "%s%%0A", $0} END{print ""}'; }
+        cmake --build macos/build --target package_app 2>&1 | tee package.log || { grep -v 'Cannot resolve rpath\|using QList' package.log | tail -15 | note "package_app"; exit 1; }
+        macos/tests/package_check.sh macos/build/PadPlus.app --packaged 2>&1 | tee check.log || { grep -v '^ok' check.log | tail -15 | note "package_check"; exit 1; }
+
+    - name: Disk image
+      run: |
+        dmg="PadPlus-${{ steps.version.outputs.version }}-arm64.dmg"
+        macos/packaging/make_dmg.sh macos/build/PadPlus.app "$dmg"
+        shasum -a 256 "$dmg" > "$dmg.sha256"
+        cp macos/build/PadPlus.app/Contents/Resources/licenses/SOURCES.md "PadPlus-${{ steps.version.outputs.version }}-SOURCES.md"
+
+    - uses: actions/upload-artifact@v7
+      with:
+        name: PadPlus-${{ steps.version.outputs.version }}-arm64
+        path: |
+          PadPlus-*.dmg
+          PadPlus-*.dmg.sha256
+          PadPlus-*-SOURCES.md
+
+  release:
+    if: github.ref_type == 'tag'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/download-artifact@v7
+      with:
+        name: PadPlus-${{ needs.build.outputs.version }}-arm64
+    - name: Publish the release
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        cat > notes.md <<'NOTES'
+        PadPlus is a macOS editor (Apple Silicon) based on the Notepad++ source code. It is an independent project: not affiliated with, endorsed by or supported by the Notepad++ project.
+
+        **Install:** open the disk image and drag PadPlus to Applications.
+
+        **First launch:** the app is not notarized by Apple, so macOS blocks it. Either allow it in System Settings > Privacy & Security > "Open Anyway", or run:
+
+            xattr -dr com.apple.quarantine /Applications/PadPlus.app
+
+        Licence: GPL v3. The licence texts of everything inside the app are in `PadPlus.app/Contents/Resources/licenses`. Source: this tag; `SOURCES.md` (attached, and inside the app) lists where the source of each embedded library is.
+        NOTES
+        sed -i 's/^        //' notes.md
+        gh release create "$GITHUB_REF_NAME" PadPlus-*.dmg PadPlus-*.dmg.sha256 PadPlus-*-SOURCES.md --repo "$GITHUB_REPOSITORY" --title "PadPlus ${{ needs.build.outputs.version }}" --notes-file notes.md
