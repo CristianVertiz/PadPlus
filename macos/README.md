@@ -75,6 +75,7 @@ open macos/build/PadPlus.app                                                # op
 
 **Files and views**
 - Tabs in two views (main and sub) with Move / Clone to Other View and synchronized scrolling (vertical and horizontal, independent). Many tabs scroll.
+- Double-click the empty part of a tab strip to create a new document in that view.
 - Open, Save, Save As, Save All, Close All, Open Recent, drag and drop, opening from Finder ("Open With", Dock icon), session restore (`session.xml`).
 - Encodings: ANSI, UTF-8, UTF-8 BOM, UTF-16 BE / LE BOM, detected on open and preserved on save. EOL detection and conversion.
 - Print (Cmd+P) with Scintilla's own formatter; dark themes print black on white.

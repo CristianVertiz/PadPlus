@@ -6,6 +6,7 @@
 #include <QDir>
 #include <QFile>
 #include <QMenuBar>
+#include <QMouseEvent>
 #include <QTabBar>
 #include <QToolBar>
 #include <QTemporaryDir>
@@ -122,6 +123,29 @@ int main(int argc, char** argv) {
 	CHECK(win.toolbar()->actions().at(0)->text().remove('&') == "Nouveau");
 	win.applyLocalization(QString());
 	CHECK(win.actionByCmd(IDM_FILE_NEW)->text() == "New" && win.menuBar()->actions().at(0)->text() == "&File");
+
+	// ---- double-click on the empty part of the tab strip: new document; on a tab: nothing ----
+	{
+		auto dbl = [](QWidget* w, QPoint p) { QMouseEvent e(QEvent::MouseButtonDblClick, QPointF(p), QPointF(w->mapToGlobal(p)), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier); QCoreApplication::sendEvent(w, &e); };
+		QTabBar* bar = win.tabBar(0); QWidget* strip = bar->parentWidget();
+		CHECK(strip->objectName() == "tabStrip");
+		int n = bar->count();
+		dbl(strip, QPoint(strip->width() - 5, strip->height() / 2));
+		CHECK(bar->count() == n + 1 && bar->currentIndex() == n);
+		{	// untitled documents are numbered: no two tabs share a name (they were all "new 1")
+			QStringList names; for (int i = 0; i < bar->count(); ++i) names << bar->tabText(i);
+			dbl(strip, QPoint(strip->width() - 5, strip->height() / 2));
+			CHECK(!names.contains(bar->tabText(bar->count() - 1)) && bar->tabText(bar->count() - 1).startsWith("new "));
+			win.actionByCmd(IDM_FILE_CLOSE)->trigger();
+		}
+		dbl(bar, bar->tabRect(0).center());
+		CHECK(bar->count() == n + 1);
+		win.actionByCmd(IDM_VIEW_CLONE_TO_ANOTHER_VIEW)->trigger(); pump();      // second view appears with one tab
+		QTabBar* bar2 = win.tabBar(1); int n2 = bar2->count();
+		dbl(bar2->parentWidget(), QPoint(bar2->parentWidget()->width() - 5, 5));
+		CHECK(bar2->count() == n2 + 1 && bar->count() == n + 1);
+		while (bar2->count()) win.actionByCmd(IDM_FILE_CLOSE)->trigger();                // close the second view again
+	}
 
 	// ---- many tabs scroll instead of widening the window ----
 	for (int i = 0; i < 40; ++i) win.actionByCmd(IDM_FILE_NEW)->trigger();

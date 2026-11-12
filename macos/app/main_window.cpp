@@ -95,6 +95,7 @@ MainWindow::MainWindow(NppHost& host) : _h(host) {
 		auto* lay = new QVBoxLayout(p.root); lay->setContentsMargins(0, 0, 0, 0); lay->setSpacing(0);
 		auto* strip = new QWidget; strip->setObjectName("tabStrip"); strip->setAttribute(Qt::WA_StyledBackground, true);   // the native tab bar paints its empty area itself (black in dark mode); the strip owns the background
 		auto* sl = new QHBoxLayout(strip); sl->setContentsMargins(0, 0, 0, 0); sl->setSpacing(0); sl->addWidget(p.bar); sl->addStretch(1);
+		p.strip = strip;
 		lay->addWidget(strip); lay->addWidget(p.ed);
 		_split->addWidget(p.root);
 
@@ -872,6 +873,9 @@ void MainWindow::closeEvent(QCloseEvent* e) {
 
 bool MainWindow::eventFilter(QObject* o, QEvent* ev) {
 	if (ev->type() == QEvent::FileOpen) { openPath(static_cast<QFileOpenEvent*>(ev)->file()); return true; }
+	if (ev->type() == QEvent::MouseButtonDblClick && static_cast<QMouseEvent*>(ev)->button() == Qt::LeftButton)
+		for (int i = 0; i < 2; ++i)      // double-click on the empty part of a tab strip: new document in that view (as in Notepad++ and Sublime Text)
+			if (o == _p[i].strip || (o == _p[i].bar && _p[i].bar->tabAt(static_cast<QMouseEvent*>(ev)->position().toPoint()) < 0)) { setActivePane(i); newDoc(); return true; }
 	return QMainWindow::eventFilter(o, ev);
 }
 
