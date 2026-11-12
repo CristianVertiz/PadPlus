@@ -41,7 +41,12 @@ jobs:
       run: |
         fails=0
         for t in core_test bridge_test host_test window_test dialogs_test settings_ui_test panels_test toolbar_test macro_test extras_test more_test; do
-          if QT_QPA_PLATFORM=offscreen macos/build/$t > "$t.log" 2>&1; then echo "ok    $t"; else echo "FAIL  $t"; tail -20 "$t.log"; fails=1; fi
+          if QT_QPA_PLATFORM=offscreen macos/build/$t > "$t.log" 2>&1; then echo "ok    $t"; continue; fi
+          echo "FAIL  $t"; tail -20 "$t.log"; fails=1
+          # a crash leaves no output of its own: wait for macOS to write the crash report and print where it happened
+          for i in 1 2 3 4 5 6; do ls ~/Library/Logs/DiagnosticReports/$t*.ips >/dev/null 2>&1 && break; sleep 5; done
+          macos/tests/print_crash.py $t 2>&1 | tee "$t.crash" || true
+          [ -s "$t.crash" ] && awk -v t="$t" 'BEGIN{printf "::error title=%s::", t} {gsub(/%/,"%25"); printf "%s%%0A", $0} END{print ""}' "$t.crash"
         done
         exit $fails
 
