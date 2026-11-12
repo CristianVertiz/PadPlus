@@ -175,3 +175,9 @@ inline char* lstrcpynA(char* d, const char* s, int n) { if (n <= 0) return d; st
 inline char* lstrcpyA(char* d, const char* s) { return strcpy(d, s); }
 inline char* lstrcatA(char* d, const char* s) { return strcat(d, s); }
 inline int lstrlenA(const char* s) { return s ? (int)strlen(s) : 0; }
+// A view that exists counts as visible. As a no-op stub (always "hidden"), FileManager ignored every open untitled document when it
+// numbered a new one, so each was called "new 1"; looking an untitled document up by name failed for the same reason.
+#define NPP_HAVE_IsWindowVisible
+inline BOOL IsWindowVisible(HWND h) { return h != nullptr; }
+#define NPP_HAVE__wtoi   // without this the catch-all stub template in win_auto.h wins overload resolution for a non-const argument
+inline int _wtoi(const wchar_t* s) { return s ? static_cast<int>(wcstol(s, nullptr, 10)) : 0; }   // was a stub returning 0: the number of "new N" was never read back

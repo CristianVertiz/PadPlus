@@ -72,7 +72,7 @@ protected:
 	void closeEvent(QCloseEvent*) override;
 	bool eventFilter(QObject*, QEvent*) override;
 private:
-	struct Pane { QWidget* root = nullptr; QTabBar* bar = nullptr; ScintillaEdit* ed = nullptr; std::vector<Buffer*> docs; };
+	struct Pane { QWidget* root = nullptr; QWidget* strip = nullptr; QTabBar* bar = nullptr; ScintillaEdit* ed = nullptr; std::vector<Buffer*> docs; };
 
 	void buildMenus();
 	void buildSearchExtras(QMenu* search);
