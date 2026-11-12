@@ -34,6 +34,7 @@ int main(int argc, char** argv) {
 	installQtBridge(); bootCore(settings.toStdWString());
 	NppHost& host = NppHost::get(); host.init();
 	MainWindow win(host); win.restoreSession();
+	CHECK(win.tabBar(0)->count() == 1 && win.tabBar(0)->tabText(0) == "new 1");      // a fresh start shows "new 1" (it was "new 2": the core's own first document was never shown)
 	win.resize(1000, 600); win.show();
 	ScintillaEdit* ed = win.editor(0);
 	auto pump = [] { QCoreApplication::processEvents(); };

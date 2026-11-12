@@ -35,6 +35,7 @@ void NppHost::init() {
 	_scratch->init(nullptr, nullptr);
 	_scratch->execute(SCI_SETMODEVENTMASK, MODEVENTMASK_OFF);
 	MainFileManager.init(_npp, _scratch);
+	_initial = _main->getCurrentBuffer();          // ScintillaEditView::init attached it (attachDefaultDoc); on Windows it is the first tab
 
 	configureViews();
 
@@ -58,6 +59,7 @@ Buffer* NppHost::open(const std::wstring& path) {
 	BufferID id = MainFileManager.loadFile(path.c_str());
 	return id == BUFFER_INVALID ? nullptr : MainFileManager.getBufferByID(id);
 }
+Buffer* NppHost::takeInitialDocument() { Buffer* b = _initial; _initial = nullptr; return b; }
 Buffer* NppHost::newDocument() { return MainFileManager.getBufferByID(MainFileManager.newEmptyDocument()); }
 
 void NppHost::show(int which, Buffer* b) {
