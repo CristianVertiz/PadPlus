@@ -73,6 +73,15 @@ bool NppHost::save(Buffer* b, const std::wstring& path) {
 }
 
 bool NppHost::reload(Buffer* b) { return MainFileManager.reloadBuffer(b->getID()); }
+// One idle buffer per view, created like the core's own "invisible" buffers (not a main-edit-zone title, so it is never numbered as "new N").
+void NppHost::park(int which) {
+	static Buffer* idle[2] = {};
+	if (!idle[which]) {
+		Document d = static_cast<Document>(_scratch->execute(SCI_CREATEDOCUMENT, 0, SC_DOCUMENTOPTION_TEXT_LARGE));
+		idle[which] = MainFileManager.getBufferByID(MainFileManager.bufferFromDocument(d, false));
+	}
+	show(which, idle[which]);
+}
 void NppHost::close(int which, Buffer* b) { MainFileManager.closeBuffer(b->getID(), &view(which)); }
 
 // ---------------------------------------------------------------------------------------------------------------------

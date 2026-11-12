@@ -32,6 +32,7 @@ public:
 	void show(int which, Buffer* b);               // make b the current document of that view
 	bool save(Buffer* b, const std::wstring& path = std::wstring()); // empty path => its own path
 	void close(int which, Buffer* b);
+	void park(int which);                          // show the view's idle document (hidden, never listed): a view must not keep pointing at a closed buffer
 	bool reload(Buffer* b);                        // re-read the file from disk (used by monitoring / tail -f)
 
 	std::wstring resourceSummary();                // "nppPath=... langs=N themes=M" (diagnostics)
