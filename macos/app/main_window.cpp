@@ -839,6 +839,7 @@ void MainWindow::addWorkspace(const QString& dir) { _wsPanel->addRoot(dir); _wsP
 // ------------------------------------------------------------------------------------------------ session / lifecycle
 void MainWindow::restoreSession() {
 	NppHost::SessionData sd = _h.loadSession();
+	Buffer* first = _h.takeInitialDocument();      // the main view's own "new 1": the first tab when nothing is restored, like Notepad++
 	for (const std::wstring& r : sd.workspaceRoots) if (QDir(q(r)).exists()) addWorkspace(q(r));
 	for (int k = 0; k < 2; ++k) {
 		for (const auto& f : sd.files[k]) {
@@ -852,7 +853,8 @@ void MainWindow::restoreSession() {
 			_p[k].bar->setCurrentIndex(i >= 0 && i < (int)_p[k].docs.size() ? i : 0);
 		}
 	}
-	if (_p[0].docs.empty() && _p[1].docs.empty()) newDoc();
+	if (_p[0].docs.empty() && _p[1].docs.empty()) { if (first) addDoc(0, first); else newDoc(); }
+	else if (first && !_p[0].docs.empty()) _h.close(0, first);   // not needed: drop it, or it would keep the name "new 1" taken without being shown
 	else if (_p[sd.activeView].docs.empty()) setActivePane(_p[0].docs.empty() ? 1 : 0);
 	else setActivePane(sd.activeView);
 	updateStatus();
