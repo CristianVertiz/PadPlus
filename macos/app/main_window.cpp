@@ -242,14 +242,21 @@ bool MainWindow::closeTab(int which, int idx) {
 	if (idx < 0 || idx >= (int)p.docs.size()) return true;
 	Buffer* b = p.docs[idx];
 	if (!maybeSave(which, b)) return false;
+	if (which == 0 && p.docs.size() == 1 && _p[1].docs.empty()) {      // the only document, untitled and unmodified: nothing to close (Notepad++ keeps it too)
+		NppHost::DocInfo d = _h.info(b);
+		if (d.untitled && !d.dirty) return true;
+	}
 	p.docs.erase(p.docs.begin() + idx);
 	p.bar->blockSignals(true); p.bar->removeTab(idx); p.bar->blockSignals(false);
+	// The view must show something else BEFORE the buffer is closed: closing frees it, and the view's next switch would
+	// save the caret position into the freed buffer (an intermittent crash, seen on CI in toolbar_test).
+	if (!p.docs.empty()) activate(which, p.bar->currentIndex());
+	else {
+		_h.park(which);                                                  // nothing left in this view: point it at its idle document
+		if (_p[1 - which].docs.empty()) { _p[1].root->hide(); _p[0].root->show(); _active = 0; _h.setActiveView(0); newDoc(); }   // keep one document open, like Notepad++
+		else { p.root->hide(); setActivePane(1 - which); }
+	}
 	_h.close(which, b);
-	if (p.docs.empty()) {
-		if (which == 1) { p.root->hide(); setActivePane(0); }
-		else if (_p[1].docs.empty()) { newDoc(); }       // keep one document open, like Notepad++
-		else { _p[0].root->hide(); setActivePane(1); }
-	} else activate(which, p.bar->currentIndex());
 	updateStatus();
 	refreshDocList();
 	return true;
