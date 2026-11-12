@@ -28,6 +28,7 @@ public:
 
 	Buffer* open(const std::wstring& path);        // load via FileManager; nullptr on failure
 	Buffer* newDocument();                         // untitled
+	Buffer* takeInitialDocument();                 // the untitled document the core gives the main view at start-up ("new 1"); returned once, then nullptr
 	void show(int which, Buffer* b);               // make b the current document of that view
 	bool save(Buffer* b, const std::wstring& path = std::wstring()); // empty path => its own path
 	void close(int which, Buffer* b);
@@ -117,5 +118,6 @@ public:
 private:
 	ScintillaEditView *_main = nullptr, *_sub = nullptr, *_scratch = nullptr;
 	Notepad_plus* _npp = nullptr;
+	Buffer* _initial = nullptr;
 	int _active = MAIN;
 };
