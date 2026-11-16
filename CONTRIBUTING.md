@@ -11,7 +11,7 @@ Changes to Notepad++ itself (the Windows application) belong to [notepad-plus-pl
 
 ## Making a change
 
-- Branch from `macos` and open the pull request against `macos`. The `master` branch only mirrors upstream.
+- Branch from `macos` and open the pull request against `macos`. The `master` branch only mirrors upstream; how upstream changes are brought in is described in [macos/UPSTREAM_SYNC.md](macos/UPSTREAM_SYNC.md).
 - Keep the change small and focused. No unrelated refactoring or reformatting.
 - The macOS code lives in `macos/`. Do not modify `scintilla/` or `lexilla/`.
 - Edit other upstream files (`PowerEditor/`, `boostregex/`) only when there is no other way. Keep such edits minimal, keep the file's line endings

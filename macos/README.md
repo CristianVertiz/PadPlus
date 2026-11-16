@@ -2,7 +2,7 @@
 
 How to build, package, run, test and release PadPlus, a macOS editor based on the Notepad++ source code. To just install the app, see the [main README](../README.md).
 
-Related documents: [what is reused, ported and new](REUSE_PORT_NEW.md), [third-party notices](THIRD_PARTY_NOTICES.md), and the [port plan and history](MACOS_PORT_PLAN.md).
+Related documents: [keeping in step with Notepad++](UPSTREAM_SYNC.md), [what is reused, ported and new](REUSE_PORT_NEW.md), [third-party notices](THIRD_PARTY_NOTICES.md), and the [port plan and history](MACOS_PORT_PLAN.md).
 
 **Contents:** [Prerequisites](#prerequisites) · [Build](#build) · [Package](#package-a-self-contained-app) · [Run](#run-the-app) · [Features](#features) · [CI and releases](#continuous-integration-and-releases) · [Test](#test) · [Known gaps](#known-gaps) · [Where things live](#where-things-live) · [Troubleshooting](#troubleshooting)
 
