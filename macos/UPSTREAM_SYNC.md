@@ -78,7 +78,7 @@ A merge without conflicts is not yet a working build. In order of likelihood:
    the compatibility layer does not have. Add it to `macos/compat/` (see "Troubleshooting" in the [developer guide](README.md)).
    A function whose result matters needs a real implementation in `win_impl.h` **and** a `#define NPP_HAVE_<name>`, or the catch-all stub
    in `win_auto.h` silently wins and returns 0.
-2. **A link error `Undefined symbols`**: a compiled core file now calls into a file PadPlus does not compile. Either    the `npp_core` library in `macos/CMakeLists.txt` (if it is UI-free) or add a stand-in to `macos/compat/ui_stubs.cpp`.
+2. **A link error `Undefined symbols`**: a compiled core file now calls into a file PadPlus does not compile. Either add that file to the `npp_core` library in `macos/CMakeLists.txt` (if it is UI-free) or add a stand-in to `macos/compat/ui_stubs.cpp`.
 3. **A test fails**: upstream changed behaviour the tests pin down (a default setting, a file format, a menu command id). Decide whether the
    test or the Qt code has to follow.
 4. **Nothing fails, but a setting does nothing**: upstream added a preference or a command that the core now reads and the Qt interface
